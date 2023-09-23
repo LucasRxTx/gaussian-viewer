@@ -3,6 +3,7 @@ import json
 import logging
 import time
 import traceback
+from typing import NamedTuple
 
 import av
 from aiortc import RTCPeerConnection, RTCSessionDescription, RTCIceCandidate, RTCConfiguration, VideoStreamTrack
@@ -52,8 +53,7 @@ def parse_frame(container, data):
             for frame in frames:
                 return frame
     except Exception as e:
-        logging.error(e)
-        traceback.print_exc()
+        logging.exception(e)
 
     return None
 
@@ -122,9 +122,8 @@ class FrameProducer(VideoStreamTrack):
                         break
                     else:
                         raise Exception("Error parsing frame")
-            except Exception as e:
-                logging.error(e)
-                logging.debug(traceback.format_exc())
+            except Exception:
+                logging.exception("Error parsing frame")
                 failed_attempts += 1
                 if failed_attempts >= max_failed_attempts:
                     logging.error(f"Failed to render frame after {failed_attempts} attempts")
